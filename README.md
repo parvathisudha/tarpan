@@ -105,7 +105,7 @@ create_db_entry.py -db "Tarpan.db" -sampid "sample01" -normid "sample01Norm"
                    -mutfile "sample01Mut.vcf" -muttool "Strelka2"
                    -mutfile "sample01Mut02.vcf" -muttool "MuTect"
                    -svfile "sample01SV.vcf" -svtool "Manta"
-                   -snp "sample01SNP.csv" -met "sample01MET.csv" -depth "sample01DEP.csv"
+                   -snp "sample01SNP.txt" -met "sample01MET.txt" -depth "sample01DEP.txt"
                    -log "sample01.log" -patid "patientId" -sex "Male"
 ```
 
@@ -117,7 +117,7 @@ required_args = -db, -sampid
 update_db_entry.py -db "Tarpan.db" -sampid "sample01" -normid "sample01Norm"
                    -mutfile "sample01Mut.vcf" -muttool "Strelka2"
                    -svfile "sample01SV.vcf" -svtool "Manta"
-                   -snp "sample01SNP.csv" -met "sample01MET.csv" -depth "sample01DEP.csv"
+                   -snp "sample01SNP.txt" -met "sample01MET.txt" -depth "sample01DEP.txt"
                    -log "sample01.log" -patid "patientId" -sex "Male"
 ```
 
