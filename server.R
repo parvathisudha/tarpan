@@ -551,6 +551,9 @@ shinyServer(function(input, output, session) {
       CytoBandIdeogram <- UCSC.HG38.Human.CytoBandIdeogram
     }
 
+    #if the chr prefix is on chrom, remove it
+    structvar$chrom <- gsub("chr", "", structvar$chrom)
+    
     if (nrow(structvar) > 0) {
       if (!input$show_failed_structvars) {
         structvar <- structvar[structvar$filter %in% "PASS", ]
@@ -1249,17 +1252,9 @@ shinyServer(function(input, output, session) {
                     input$sample,"'")
     genome_struct <- dbGetQuery(dbhandle, query, stringsAsFactors = FALSE)
 
-    #hide blacklist by default
-    if (!input$show_blacklist) {
-      for (i in 1:nrow(blacklist)) {
-        genome_struct <- genome_struct[!(genome_struct$start >= blacklist$V2[i] & 
-                genome_struct$end <= blacklist$V3[i] &
-                genome_struct$chrom %in% blacklist$V1[i]), ]
-      }
-    }
-
-    res <- data.frame(mean_normal_depth = mean(genome_struct$normal_mean), 
-                      mean_tumor_depth = mean(genome_struct$tumor_mean))
+    res <- data.frame(genome_struct)
+    
+    res <- res[-1]
     res
   }))
 
