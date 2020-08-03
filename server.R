@@ -1254,7 +1254,7 @@ shinyServer(function(input, output, session) {
 
     res <- data.frame(genome_struct)
     
-    res <- res[-1]
+    res <- res[,-(1:2)]
     res
   }))
 
