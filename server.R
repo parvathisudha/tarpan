@@ -920,6 +920,9 @@ shinyServer(function(input, output, session) {
     genome_depth$end <- as.numeric(genome_depth$end)
     genome_depth$normal_mean <- as.numeric(genome_depth$normal_mean)
     genome_depth$tumor_mean <- as.numeric(genome_depth$tumor_mean)
+    
+     #remove chr prefix if it exists
+    genome_depth$chrom <- gsub("chr","",genome_depth$chrom)
 
     #remove the sex chromosomes and where the mean == 0
     genome_depth <- genome_depth[genome_depth$tumor_mean != 0, ]
