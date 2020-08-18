@@ -259,6 +259,11 @@ shinyServer(function(input, output, session) {
       
       last_gene_line <- c()
       last_gene_name <- c()
+      
+      if(!input$hideXY) {
+        genome_bed$chrom[genome_bed$chrom %in% "X"] <- "23"
+        genome_bed$chrom[genome_bed$chrom %in% "Y"] <- "24"
+      }
 
       group <- genome_bed[genome_bed$chrom == input$chromnum, ]
       pal <- c("#1f78b4", "#33a02c", "#e31a1c", "#ff7f00", "#6a3d9a",
@@ -432,6 +437,12 @@ shinyServer(function(input, output, session) {
       draw_list_max <- c()
       draw_list_color <- c()
       draw_list_names <- c()
+      
+      if(!input$hideXY) {
+        genome_bed$chrom[genome_bed$chrom %in% "X"] <- "23"
+        genome_bed$chrom[genome_bed$chrom %in% "Y"] <- "24"
+      }
+      
       group <- genome_bed[genome_bed$chrom == input$chromnum, ]
 
       pal <- c("#1f78b4", "#33a02c", "#e31a1c", "#ff7f00", "#6a3d9a", "#757780",
