@@ -1,8 +1,8 @@
+# author = Jonathan Huang
 library(data.table)
 library(dplyr)
 library(stringr)
 ## notes: counts are in x,y, where x is tier 1 and y is tier 2. Tier 2 is more permissive. Going with tier 1 cause DP is in tier 1
-#gm <- read.table("/Users/huangj/Documents/Rotations/KunHuangRotation/genome_muts.txt") %>% as.data.table
 
 ####
 ## Helper Functions
