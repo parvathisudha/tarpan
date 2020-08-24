@@ -8,10 +8,14 @@ library(DBI)
 library(RSQLite)
 #CircosDiagram
 library(RCircos)
+library(data.table)
+library(dplyr)
+library(stringr)
 
 #load utility scripts
 source("utility/read_vcf_for_sample.R")
 source("utility/readConfig.R")
+source("utility/calculate_vafs.R")
 
 #get database from config file
 databases <- config::get("SQLiteDB")
@@ -259,12 +263,10 @@ shinyServer(function(input, output, session) {
       
       last_gene_line <- c()
       last_gene_name <- c()
-      
       if(!input$hideXY) {
         genome_bed$chrom[genome_bed$chrom %in% "X"] <- "23"
         genome_bed$chrom[genome_bed$chrom %in% "Y"] <- "24"
       }
-
       group <- genome_bed[genome_bed$chrom == input$chromnum, ]
       pal <- c("#1f78b4", "#33a02c", "#e31a1c", "#ff7f00", "#6a3d9a",
                "#757780", "#b15928")
@@ -437,12 +439,10 @@ shinyServer(function(input, output, session) {
       draw_list_max <- c()
       draw_list_color <- c()
       draw_list_names <- c()
-      
       if(!input$hideXY) {
         genome_bed$chrom[genome_bed$chrom %in% "X"] <- "23"
         genome_bed$chrom[genome_bed$chrom %in% "Y"] <- "24"
       }
-      
       group <- genome_bed[genome_bed$chrom == input$chromnum, ]
 
       pal <- c("#1f78b4", "#33a02c", "#e31a1c", "#ff7f00", "#6a3d9a", "#757780",
@@ -561,7 +561,7 @@ shinyServer(function(input, output, session) {
       gsub("chr", "" , UCSC.HG38.Human.CytoBandIdeogram$Chromosome)
       CytoBandIdeogram <- UCSC.HG38.Human.CytoBandIdeogram
     }
-
+    
     #if the chr prefix is on chrom, remove it
     structvar$chrom <- gsub("chr", "", structvar$chrom)
     
@@ -773,6 +773,7 @@ shinyServer(function(input, output, session) {
       genome_muts <- dbGetQuery(dbhandle, query, stringsAsFactors = FALSE)
       genome_muts$mut_id <- NULL
       genome_muts$sample_id <- NULL
+      genome_muts <- genome_muts %>% as.data.table %>% get_vaf
     } else { #otherwise, parse out the data
       #load the data
       #get the samples that are in the database
@@ -920,8 +921,7 @@ shinyServer(function(input, output, session) {
     genome_depth$end <- as.numeric(genome_depth$end)
     genome_depth$normal_mean <- as.numeric(genome_depth$normal_mean)
     genome_depth$tumor_mean <- as.numeric(genome_depth$tumor_mean)
-    
-     #remove chr prefix if it exists
+    #remove chr prefix if it exists
     genome_depth$chrom <- gsub("chr","",genome_depth$chrom)
 
     #remove the sex chromosomes and where the mean == 0
@@ -1262,13 +1262,15 @@ shinyServer(function(input, output, session) {
                                       options = list(paging = FALSE, 
                                                      searching = FALSE), {
     #load the data
-    query <- paste0("SELECT * from genom_depth where sample_id = '",
+    query <- paste0("SELECT * from genom_metrics where sample_id = '",
                     input$sample,"'")
     genome_struct <- dbGetQuery(dbhandle, query, stringsAsFactors = FALSE)
 
+ 
     res <- data.frame(genome_struct)
     
-    res <- res[-1]
+    res <- res[,-(1:2)]
+                      
     res
   }))
 
