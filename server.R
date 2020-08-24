@@ -1,3 +1,6 @@
+# Original code by Cody Ashby
+# Modified by Parvathi Sudha & Jonathan Huang
+
 #dependencies
 library(shiny)
 library(shinyBS)
