@@ -521,7 +521,7 @@ shinyServer(function(input, output, session) {
     query <- paste0(query, input$sample,"'")
     structvar <- dbGetQuery(dbhandle, query, stringsAsFactors = FALSE)
     #do mutations exist for this sample?
-    mutations <- get_mutations(all_chroms = 1)
+    mutations <- get_mutations(all_chroms = 1) %>% dplyr::select(-c("normal_vaf", "tumor_vaf"))
     #do copy number regions exist for this sample?
     query <- "SELECT chrom, start, end, id, normal_mean, tumor_mean, "
     query <- paste0(query, "tumor_depth from GENOM_DEPTH where sample_id = '")
@@ -795,8 +795,9 @@ shinyServer(function(input, output, session) {
         genome_muts <- genome_muts[!(genome_muts$symbol %in% ""), ]
       }
       # Add VAF columns to condensed mutation table
-      genome_muts <- left_join(genome_muts %>% mutate_all(as.character),
-                               vaf, by = c("chrom", "pos", "ref", "alt", "filter")) %>%
+      vaf$pos <- as.numeric(vaf$pos)
+      genome_muts <- left_join(genome_muts, vaf, 
+                               by = c("chrom", "pos", "ref", "alt", "filter")) %>%
         dplyr::select(c(colnames(genome_muts), "normal_vaf", "tumor_vaf"))
     }
 
