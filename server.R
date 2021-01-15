@@ -538,7 +538,7 @@ shinyServer(function(input, output, session) {
       chr.exclude = NULL
     }
     if (!input$type) {
-      chromnum = input$chromnum 
+      chromnum = input$chromnum
       if(chromnum == "23")
       {
         chromnum = "X"
@@ -769,15 +769,14 @@ shinyServer(function(input, output, session) {
   }
 
   get_mutations <- function(all_chroms = 0) {
+    # Get VAF information
+    vaf <- get_all_mutation_info(dbhandle, input$sample)
+
     #load the raw vcf
-    if (input$all_mutation_information) {
-      query <- "SELECT * from GENOM_MUTATIONS where sample_id = '"
-      query <- paste0(query, input$sample,"'")
-      genome_muts <- dbGetQuery(dbhandle, query, stringsAsFactors = FALSE)
-      genome_muts$mut_id <- NULL
-      genome_muts$sample_id <- NULL
-      genome_muts <- genome_muts %>% as.data.table %>% get_vaf
-    } else { #otherwise, parse out the data
+    if(input$all_mutation_information) {
+      genome_muts <- vaf
+    }
+    else {
       #load the data
       #get the samples that are in the database
       query <- "SELECT distinct mut_tool from GENOM_MUTATIONS "
@@ -795,12 +794,14 @@ shinyServer(function(input, output, session) {
       if (input$hide_blank_mutations) {
         genome_muts <- genome_muts[!(genome_muts$symbol %in% ""), ]
       }
-
-
+      # Add VAF columns to condensed mutation table
+      genome_muts <- left_join(genome_muts %>% mutate_all(as.character),
+                               vaf, by = c("chrom", "pos", "ref", "alt", "filter")) %>%
+        dplyr::select(c(colnames(genome_muts), "normal_vaf", "tumor_vaf"))
     }
 
     #remove chrom prefix
-    genome_muts$chrom = gsub("chr", "", genome_muts$chrom)
+    genome_muts$chrom <- gsub("chr", "", genome_muts$chrom)
 
     if(!input$type && all_chroms == 0) {
       genome_muts <- genome_muts[genome_muts$chrom %in% input$chromnum, ]

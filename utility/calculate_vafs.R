@@ -48,6 +48,16 @@ get_indel_vaf <- function(info, format){
 ####
 ## Main function which runs the helper functions
 
+get_all_mutation_info <- function(dbhandle, sample) {
+  query <- "SELECT * from GENOM_MUTATIONS where sample_id = '"
+  query <- paste0(query, sample,"'")
+  genome_muts <- dbGetQuery(dbhandle, query, stringsAsFactors = FALSE)
+  genome_muts$mut_id <- NULL
+  genome_muts$sample_id <- NULL
+  genome_muts <- genome_muts %>% as.data.table %>% get_vaf
+  genome_muts
+}
+
 ## it seems he doesn't keep mut_tools in the table so I made edits to pretty much grab it from the format column
 get_vaf <- function(dt, tool=FALSE){
   ## dt is the data.table, tool is the tool i.e strelka_snvs/indel etc
@@ -69,7 +79,7 @@ get_vaf <- function(dt, tool=FALSE){
     ## if false just run both i guess
     dt <- dt %>% s_snvs %>% s_indels
   } else if (tool == "strelka_snvs") { dt <- dt %>% s_snvs}
-  else if (tool == "strelka_snvs") { dt <- dt %>% s_indels}
+  else if (tool == "strelka_indels") { dt <- dt %>% s_indels}
   
   ### change all NAs to char "NA"
   # dt[is.na(normal_vaf), normal_vaf := "N/A"]
