@@ -44,6 +44,24 @@ get_indel_vaf <- function(info, format){
   return(signif(count/(DP + count), digits=3))
 }
 
+# Function to extract normal_dp and tumor_dp columns from dataframe
+get_dp <- function(dt, tool=FALSE){
+  ## Split normal/tumor column using ":" and create a named list with 
+  ## corresponding split format column as list names. 
+  ## Choose "DP" column for each list in column
+  dt$normal_dp <- mapply(function(x) {x["DP"]}, 
+                         mapply(function(x,y) {setNames(x, y)}, 
+                                str_split(dt$normal, ':'), 
+                                str_split(dt$format, ':'), SIMPLIFY=F), 
+                         SIMPLIFY = F)
+  
+  dt$tumor_dp <- mapply(function(x) {x["DP"]}, 
+                        mapply(function(x,y) {setNames(x, y)}, 
+                               str_split(dt$tumor, ':'), 
+                               str_split(dt$format, ':'), SIMPLIFY=F), 
+                        SIMPLIFY = F)
+  return(dt)
+}
 
 ####
 ## Main function which runs the helper functions
@@ -54,7 +72,7 @@ get_all_mutation_info <- function(dbhandle, sample) {
   genome_muts <- dbGetQuery(dbhandle, query, stringsAsFactors = FALSE)
   genome_muts$mut_id <- NULL
   genome_muts$sample_id <- NULL
-  genome_muts <- genome_muts %>% as.data.table %>% get_vaf
+  genome_muts <- genome_muts %>% as.data.table %>% get_vaf %>% get_dp
   genome_muts
 }
 
