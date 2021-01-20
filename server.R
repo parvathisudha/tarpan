@@ -1,5 +1,5 @@
 # Original code by Cody Ashby
-# Modified by Parvathi Sudha & Jonathan Huang
+# Modified by Parvathi Sudha, Jonathan Huang & Abhijeet Malatpure
 
 #dependencies
 library(shiny)
@@ -798,7 +798,7 @@ shinyServer(function(input, output, session) {
       vaf$pos <- as.numeric(vaf$pos)
       genome_muts <- left_join(genome_muts, vaf, 
                                by = c("chrom", "pos", "ref", "alt", "filter")) %>%
-        dplyr::select(c(colnames(genome_muts), "normal_vaf", "tumor_vaf"))
+        dplyr::select(c(colnames(genome_muts), "normal_vaf", "tumor_vaf", "normal_dp", "tumor_dp"))
     }
 
     #remove chrom prefix
