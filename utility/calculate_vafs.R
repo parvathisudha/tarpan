@@ -1,4 +1,4 @@
-# author = Jonathan Huang
+# author = Jonathan Huang and Abhijeet Malatpure
 library(data.table)
 library(dplyr)
 library(stringr)
